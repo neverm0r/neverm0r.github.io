@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on neverm0r&#39;s blog</title>
+    <link>https://neverm0r.github.io/posts/</link>
+    <description>Recent content in Posts on neverm0r&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 14 Jul 2023 00:03:02 +0700</lastBuildDate><atom:link href="https://neverm0r.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CVE-2022-0995: Heap overflow in watch_queue subsystem analysis and PoC</title>
+      <link>https://neverm0r.github.io/posts/cve-2022-0995/</link>
+      <pubDate>Fri, 14 Jul 2023 00:03:02 +0700</pubDate>
+      
+      <guid>https://neverm0r.github.io/posts/cve-2022-0995/</guid>
+      <description>For the last few months, I have been shifting my interested from user space program to kernel space, which is harder and a lot more interesting since the exploit code is usually written in C (my favorite language to use :d). After doing some easy and old kernel pwning on pwnable.kr, I started to look at up-to-date kernel CTFs challenge. After feeling a bit comfortable with some modern techniques and was able to solve some CTFs kernel pwn, I decided to find an old bug and try to reproduce it.</description>
+    </item>
+    
+  </channel>
+</rss>
