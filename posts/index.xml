@@ -9,21 +9,12 @@
     <lastBuildDate>Thu, 27 Jul 2023 07:57:40 +0700</lastBuildDate><atom:link href="https://neverm0r.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>ImaginaryCTF 2023 - window-of-opportunity</title>
-      <link>https://neverm0r.github.io/posts/imaginary/</link>
+      <link>https://neverm0r.github.io/posts/imagine/</link>
       <pubDate>Thu, 27 Jul 2023 07:57:40 +0700</pubDate>
       
-      <guid>https://neverm0r.github.io/posts/imaginary/</guid>
+      <guid>https://neverm0r.github.io/posts/imagine/</guid>
       <description>This is a writeup that was done after the CTF since I was busy playing The Odyssey CTF with my team Emu Exploit and got 3rd place. This challenge is a kernel pwn challenge and it is not hard at all, however I decided to write something about it since the unintended solution for this one is quite interesting.
 window-of-opportunity (490 pts) - 11 solves - by Eth007 Description Sometimes, there is a glimmer of hope, a spark of inspiration, a window of opportunity.</description>
-    </item>
-    
-    <item>
-      <title>CVE-2022-0995: Heap overflow in watch_queue subsystem analysis and PoC</title>
-      <link>https://neverm0r.github.io/posts/cve-2022-0995/</link>
-      <pubDate>Fri, 14 Jul 2023 00:03:02 +0700</pubDate>
-      
-      <guid>https://neverm0r.github.io/posts/cve-2022-0995/</guid>
-      <description>For the last few months, I have been shifting my interested from user space program to kernel space, which is harder and a lot more interesting since the exploit code is usually written in C (my favorite language to use :d). After doing some easy and old kernel pwning on pwnable.kr, I started to look at up-to-date kernel CTFs challenge. After feeling a bit comfortable with some modern techniques and was able to solve some CTFs kernel pwn, I decided to find an old bug and try to reproduce it.</description>
     </item>
     
   </channel>
